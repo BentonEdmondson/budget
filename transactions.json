@@ -1,0 +1,10 @@
+{
+    "transactions": [
+        {
+            "amount": "100.29",
+            "comment": "Stuff here.",
+            "date": "2025-09-29",
+            "tag": "housing.rent"
+        }
+    ]
+}

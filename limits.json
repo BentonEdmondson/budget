@@ -1,0 +1,6 @@
+{
+    "limits": {
+        "housing.rent": "3000.00",
+        "food.fast-food": "200.00"
+    }
+}
