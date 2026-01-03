@@ -1,5 +1,5 @@
-use crate::{Money, Tag, tag::TagSlice};
 use crate::date::Date;
+use crate::{Money, Tag, tag::TagSlice};
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{self, Display},

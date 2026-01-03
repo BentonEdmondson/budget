@@ -1,7 +1,7 @@
 use crate::date::Date;
 use crate::{colors, number_parsers};
-use serde::{Serialize, Serializer};
 use serde::{Deserialize, Deserializer, de::Error};
+use serde::{Serialize, Serializer};
 use std::fmt;
 use std::ops::AddAssign;
 use std::str::FromStr;
@@ -218,13 +218,7 @@ impl Serialize for Money {
     {
         let cents: i64 = self.cents % 100;
         let dollars: i64 = self.cents / 100;
-        serializer.serialize_str(
-            format!(
-                "{}.{:02}",
-                dollars.to_string(),
-                cents.to_string()
-            )
-            .as_str(),
-        )
+        serializer
+            .serialize_str(format!("{}.{:02}", dollars.to_string(), cents.to_string()).as_str())
     }
 }

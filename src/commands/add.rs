@@ -7,7 +7,7 @@ use crate::commands::CommandError;
 use crate::date::Date;
 use crate::money::Money;
 use crate::tag::Tag;
-use crate::transaction::{Transaction,Transactions};
+use crate::transaction::{Transaction, Transactions};
 use std::fs::OpenOptions;
 use std::io::BufWriter;
 
@@ -35,12 +35,12 @@ pub fn add(mut args: Args, today: Date) -> Result<(), Box<dyn Error>> {
         comment: comment.unwrap_or("".to_string()),
         date: date.unwrap_or(today),
     };
-    
+
     transactions.add(transaction);
 
     let file = OpenOptions::new().write(true).open("transactions.json")?;
     let file = BufWriter::new(file);
     transactions.to_json_writer(file)?;
-    
+
     Ok(())
 }
