@@ -5,17 +5,22 @@ use serde::{Serialize, Serializer};
 use std::fmt;
 use std::ops::AddAssign;
 use std::str::FromStr;
+use thiserror::Error;
 
 #[derive(Debug, Eq, PartialEq, Clone, PartialOrd, Ord, Copy)]
 pub struct Money {
     cents: i64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Error, Debug, PartialEq)]
 pub enum MoneyError {
+    #[error("money should have 1 decimal point")]
     InvalidDecimalPoint,
+    #[error("money should have a dollars portion with just numbers")]
     InvalidDollars,
+    #[error("money should have a cents portion with just numbers")]
     InvalidCents,
+    #[error("money value is too large or small and overflows")]
     Overflow,
 }
 
@@ -192,12 +197,6 @@ mod tests {
             Money::from_str("100.+2").unwrap_err(),
             MoneyError::InvalidCents
         );
-    }
-}
-
-impl fmt::Display for MoneyError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
-        todo!("Trying to serialize a MoneyError; it needs to look nice!");
     }
 }
 

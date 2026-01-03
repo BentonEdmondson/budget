@@ -31,19 +31,19 @@ enum Subcommands {
     Close,
     Add {
         tag: Tag,
-        money: String,
-        #[arg(long, short)]
-        comment: Option<String>,
+        amount: Money,
         #[arg(long, short)]
         date: Option<Date>,
+        #[arg(long, short)]
+        comment: Option<String>,
     },
     Remove {
         tag: Tag,
-        money: String,
-        #[arg(long, short)]
-        comment: Option<String>,
+        amount: Money,
         #[arg(long, short)]
         date: Option<Date>,
+        #[arg(long, short)]
+        comment: Option<String>,
     },
     Status,
     Reconcile {
@@ -59,6 +59,12 @@ fn main() -> () {
 
     let result: Result<(), Box<dyn Error>> = match command.subcommand {
         Subcommands::Init => commands::init::init(),
+        Subcommands::Add {
+            tag,
+            amount,
+            date,
+            comment,
+        } => commands::add::add(tag, amount, date.unwrap_or(Date::today()), comment),
         _ => panic!("encountered unimplemented command"),
     };
 

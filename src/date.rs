@@ -15,14 +15,14 @@ pub struct Date {
 
 #[derive(Error, Debug)]
 pub enum DateError {
-    #[error("date doesn't have 3 components: {full_string}")]
-    InvalidSeparator { full_string: String },
-    #[error("date has an invalid year: {year_portion}")]
-    InvalidYear { year_portion: String },
-    #[error("date has an invalid month: {month_portion}")]
-    InvalidMonth { month_portion: String },
-    #[error("date has an invalid month: {day_portion}")]
-    InvalidDay { day_portion: String },
+    #[error("date should have exactly 3 components")]
+    InvalidSeparator,
+    #[error("date has an invalid year")]
+    InvalidYear,
+    #[error("date has an invalid month")]
+    InvalidMonth,
+    #[error("date has an invalid day")]
+    InvalidDay,
 }
 
 impl FromStr for Date {
@@ -30,41 +30,23 @@ impl FromStr for Date {
 
     fn from_str(s: &str) -> Result<Date, DateError> {
         let mut segments = s.split('-');
-        let year_portion = segments.next().ok_or(DateError::InvalidSeparator {
-            full_string: s.to_string(),
-        })?;
-        let month_portion = segments.next().ok_or(DateError::InvalidSeparator {
-            full_string: s.to_string(),
-        })?;
-        let day_portion = segments.next().ok_or(DateError::InvalidSeparator {
-            full_string: s.to_string(),
-        })?;
+        let year_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
+        let month_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
+        let day_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
         if segments.next().is_some() {
-            return Err(DateError::InvalidSeparator {
-                full_string: s.to_string(),
-            });
+            return Err(DateError::InvalidSeparator);
         }
 
         let year: u16 =
-            number_parsers::unfixed_width(year_portion).ok_or(DateError::InvalidYear {
-                year_portion: year_portion.to_string(),
-            })?;
+            number_parsers::unfixed_width(year_portion).ok_or(DateError::InvalidYear)?;
         let month: u8 =
-            number_parsers::fixed_width(month_portion, 2).ok_or(DateError::InvalidMonth {
-                month_portion: month_portion.to_string(),
-            })?;
+            number_parsers::fixed_width(month_portion, 2).ok_or(DateError::InvalidMonth)?;
         if month > 12 {
-            return Err(DateError::InvalidMonth {
-                month_portion: month_portion.to_string(),
-            });
+            return Err(DateError::InvalidMonth);
         }
-        let day: u8 = number_parsers::fixed_width(day_portion, 2).ok_or(DateError::InvalidDay {
-            day_portion: day_portion.to_string(),
-        })?;
+        let day: u8 = number_parsers::fixed_width(day_portion, 2).ok_or(DateError::InvalidDay)?;
         if day > 31 {
-            return Err(DateError::InvalidDay {
-                day_portion: day_portion.to_string(),
-            });
+            return Err(DateError::InvalidDay);
         }
 
         return Ok(Date { year, month, day });
@@ -90,15 +72,7 @@ impl Serialize for Date {
         assert!(self.month <= 12);
         assert!(self.day > 0);
         assert!(self.day <= 31);
-        serializer.serialize_str(
-            format!(
-                "{}-{:02}-{:02}",
-                self.year.to_string(),
-                self.month.to_string(),
-                self.day.to_string()
-            )
-            .as_str(),
-        )
+        serializer.serialize_str(self.to_string().as_str())
     }
 }
 
@@ -184,19 +158,10 @@ impl Date {
             0 | 13..=u8::MAX => unreachable!(),
         }
     }
-
-    fn serialize(&self) -> String {
-        format!(
-            "{}-{:02}-{:02}",
-            self.year.to_string(),
-            self.month.to_string(),
-            self.day.to_string()
-        )
-    }
 }
 
 impl Display for Date {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} {}", self.day, self.short_month_name(), self.year)
+        write!(f, "{}-{:02}-{:02}", self.year, self.month, self.day)
     }
 }
