@@ -18,7 +18,7 @@ use tag::Tag;
 use transaction::Transactions;
 use transaction_tree::TransactionTree;
 use std::path::PathBuf;
-use time::Date;
+use crate::date::Date;
 
 #[derive(Parser, Debug)]
 #[command(author, version)]
@@ -38,7 +38,6 @@ enum Subcommands {
         #[arg(long, short)]
         comment: Option<String>,
         #[arg(long, short)]
-        #[arg(value_parser = parse_date)]
         date: Option<Date>,
     },
     Remove {
@@ -47,7 +46,6 @@ enum Subcommands {
         #[arg(long, short)]
         comment: Option<String>,
         #[arg(long, short)]
-        #[arg(value_parser = parse_date)]
         date: Option<Date>, 
     },
     Status,
@@ -57,10 +55,6 @@ enum Subcommands {
     Audit {
         file: PathBuf,
     },
-}
-
-fn parse_date(s: &str) -> Result<Date, String> {
-    Date::parse(s, &time::format_description::well_known::Rfc3339).map_err(|e| format!("invalid date: {e}"))
 }
 
 fn main() {

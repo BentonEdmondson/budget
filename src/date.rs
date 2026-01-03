@@ -4,6 +4,7 @@ use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use std::fmt::{self, Display};
 use std::str::FromStr;
+use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Copy)]
 pub struct Date {
@@ -12,12 +13,16 @@ pub struct Date {
     day: u8,
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum DateError {
-    InvalidSeparator,
-    InvalidYear,
-    InvalidMonth,
-    InvalidDay,
+    #[error("date doesn't have 3 components: {full_string}")]
+    InvalidSeparator { full_string: String },
+    #[error("date has an invalid year: {year_portion}")]
+    InvalidYear { year_portion: String },
+    #[error("date has an invalid month: {month_portion}")]
+    InvalidMonth { month_portion: String },
+    #[error("date has an invalid month: {day_portion}")]
+    InvalidDay { day_portion: String },
 }
 
 impl FromStr for Date {
@@ -25,32 +30,44 @@ impl FromStr for Date {
 
     fn from_str(s: &str) -> Result<Date, DateError> {
         let mut segments = s.split('-');
-        let year_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
-        let month_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
-        let day_portion = segments.next().ok_or(DateError::InvalidSeparator)?;
+        let year_portion = segments.next().ok_or(DateError::InvalidSeparator {
+            full_string: s.to_string(),
+        })?;
+        let month_portion = segments.next().ok_or(DateError::InvalidSeparator {
+            full_string: s.to_string(),
+        })?;
+        let day_portion = segments.next().ok_or(DateError::InvalidSeparator {
+            full_string: s.to_string(),
+        })?;
         if segments.next().is_some() {
-            return Err(DateError::InvalidSeparator);
+            return Err(DateError::InvalidSeparator {
+                full_string: s.to_string(),
+            });
         }
 
         let year: u16 =
-            number_parsers::unfixed_width(year_portion).ok_or(DateError::InvalidYear)?;
+            number_parsers::unfixed_width(year_portion).ok_or(DateError::InvalidYear {
+                year_portion: year_portion.to_string(),
+            })?;
         let month: u8 =
-            number_parsers::fixed_width(month_portion, 2).ok_or(DateError::InvalidMonth)?;
+            number_parsers::fixed_width(month_portion, 2).ok_or(DateError::InvalidMonth {
+                month_portion: month_portion.to_string(),
+            })?;
         if month > 12 {
-            return Err(DateError::InvalidMonth);
+            return Err(DateError::InvalidMonth {
+                month_portion: month_portion.to_string(),
+            });
         }
-        let day: u8 = number_parsers::fixed_width(day_portion, 2).ok_or(DateError::InvalidDay)?;
+        let day: u8 = number_parsers::fixed_width(day_portion, 2).ok_or(DateError::InvalidDay {
+            day_portion: day_portion.to_string(),
+        })?;
         if day > 31 {
-            return Err(DateError::InvalidDay);
+            return Err(DateError::InvalidDay {
+                day_portion: day_portion.to_string(),
+            });
         }
 
         return Ok(Date { year, month, day });
-    }
-}
-
-impl fmt::Display for DateError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
-        todo!("Trying to serialize a DateError; it needs to look nice!");
     }
 }
 
