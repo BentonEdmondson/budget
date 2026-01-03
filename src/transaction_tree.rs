@@ -61,7 +61,7 @@ impl<'a> Category<'a> {
         // month corresponding to this TransactionTree, and should probably error
         // or be none if we are not.
 
-        Money::left_to_date_in_month(Date::now(), self.limit()?, self.spent())
+        Money::left_to_date_in_month(Date::today(), self.limit()?, self.spent())
     }
 }
 

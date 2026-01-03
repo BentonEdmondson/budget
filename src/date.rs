@@ -103,7 +103,7 @@ impl Serialize for Date {
 }
 
 impl Date {
-    pub fn now() -> Date {
+    pub fn today() -> Date {
         let now = Local::now();
 
         let day: u32 = now.day();

@@ -10,15 +10,12 @@ mod number_parsers;
 mod tag;
 mod transaction;
 mod transaction_tree;
-use clap::{Parser, Subcommand};
-use limits::Limits;
-use money::Money;
-use std::fs::File;
-use tag::Tag;
-use transaction::Transactions;
-use transaction_tree::TransactionTree;
-use std::path::PathBuf;
 use crate::date::Date;
+use clap::{Parser, Subcommand};
+use money::Money;
+use std::error::Error;
+use std::path::PathBuf;
+use tag::Tag;
 
 #[derive(Parser, Debug)]
 #[command(author, version)]
@@ -46,7 +43,7 @@ enum Subcommands {
         #[arg(long, short)]
         comment: Option<String>,
         #[arg(long, short)]
-        date: Option<Date>, 
+        date: Option<Date>,
     },
     Status,
     Reconcile {
@@ -57,19 +54,15 @@ enum Subcommands {
     },
 }
 
-fn main() {
-    let _ = Command::parse();
-    //dbg!("{}", command);
-    
-    // match command.as_str() {
-    //     "init" => {
-    //         commands::init::init(args);
-    //         return;
-    //     }
-    //     "add" => {
-    //         commands::add::add(args);
-    //         return;
-    //     }
-    //     _ => (),
-    // }
+fn main() -> () {
+    let command = Command::parse();
+
+    let result: Result<(), Box<dyn Error>> = match command.subcommand {
+        Subcommands::Init => commands::init::init(),
+        _ => panic!("encountered unimplemented command"),
+    };
+
+    if let Err(err) = result {
+        println!("error: {}", err);
+    }
 }
