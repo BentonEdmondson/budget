@@ -2,6 +2,7 @@ use std::{error::Error, fmt};
 
 pub mod add;
 pub mod init;
+pub mod remove;
 
 #[derive(Debug)]
 struct CommandError {

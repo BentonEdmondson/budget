@@ -29,7 +29,10 @@ pub fn add(
 
     transactions.add(transaction);
 
-    let file = OpenOptions::new().write(true).open("transactions.json")?;
+    let file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open("transactions.json")?;
     let file = BufWriter::new(file);
     transactions.to_json_writer(file)?;
 

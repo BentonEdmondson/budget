@@ -134,7 +134,7 @@ impl Date {
             10 => 31,
             11 => 30,
             12 => 31,
-            0 | 13..=u8::MAX => unreachable!(),
+            0 | 13.. => unreachable!(),
         }
     }
 
@@ -155,7 +155,7 @@ impl Date {
             10 => "Oct".to_string(),
             11 => "Nov".to_string(),
             12 => "Dec".to_string(),
-            0 | 13..=u8::MAX => unreachable!(),
+            0 | 13.. => unreachable!(),
         }
     }
 }

@@ -65,6 +65,12 @@ fn main() -> () {
             date,
             comment,
         } => commands::add::add(tag, amount, date.unwrap_or(Date::today()), comment),
+        Subcommands::Remove {
+            tag,
+            amount,
+            date,
+            comment,
+        } => commands::remove::remove(tag, amount, date, comment),
         _ => panic!("encountered unimplemented command"),
     };
 
